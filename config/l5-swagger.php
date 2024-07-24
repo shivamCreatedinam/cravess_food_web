@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'Meta Market APIs Documentation',
+                'title' => 'Cravess Food APP APIs Documentation',
             ],
 
             'routes' => [
