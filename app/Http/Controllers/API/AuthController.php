@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Events\RegistrationOTPSendEvent;
 use App\Http\Controllers\Controller;
+use App\Interfaces\UserInterface;
 use App\Models\User;
 use App\Models\UserLoginActivity;
 use App\Models\VerificationCodes;
@@ -23,6 +24,10 @@ use GuzzleHttp\Client;
 class AuthController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(private UserInterface $userInterface)
+    {
+    }
 
     /**
      * @OA\Post(
@@ -102,38 +107,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-        DB::beginTransaction();
-        try {
-            $user = User::create([
-                "name" => $request->name,
-                "username" => Str::slug($request->name, "_"),
-                "email" => $request->email,
-                "mobile_no" => $request->mobile,
-                "role" => "user",
-                "password" => Hash::make($request->password),
-            ]);
-            $email_otp = generateOTP();
-            $mobile_otp = generateOTP();
-            $expiresAt = now()->addMinutes(5);
-            $verificationCode = VerificationCodes::updateOrCreate(["user_id" => $user->uuid], [
-                "mobile_otp" => $mobile_otp,
-                "email_otp" => $email_otp,
-                "expire_at" => $expiresAt
-            ]);
-
-            event(new RegistrationOTPSendEvent($user));
-
-            $data = [
-                "mobile_otp" => $verificationCode->mobile_otp,
-                "email_otp" => $verificationCode->email_otp,
-                "expire_at" => $expiresAt->format('d M Y h:i:s A'),
-            ];
-            DB::commit();
-            return $this->successResponse($data, "We have sent OTP your mobile number & email. OTPs expire within 5 min.");
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->userInterface->register($request);
     }
 
     /**
@@ -254,48 +228,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-        DB::beginTransaction();
-
-        try {
-            $user = User::where('mobile_no', $request->mobile)->first();
-            $verificationCode = VerificationCodes::where('user_id', $user->uuid)->first();
-
-            if ($verificationCode) {
-                if (now()->greaterThan($verificationCode->expire_at)) {
-                    return $this->errorResponse("OTP expired. Please resend OTP.");
-                }
-                if ($request->mobile_otp !== $verificationCode->mobile_otp) {
-                    return $this->errorResponse("Mobile OTP invalid. Please resend OTP.");
-                }
-                if ($request->email_otp !== $verificationCode->email_otp) {
-                    return $this->errorResponse("Email OTP invalid. Please resend OTP.");
-                }
-
-                $user->update([
-                    'email_verified_at' => now(),
-                    'mobile_verified_at' => now(),
-                ]);
-                $verificationCode->delete();
-
-                // Generate JWT token for the user
-                $token = JWTAuth::fromUser($user);
-                $authenticatedUser = JWTAuth::setToken($token)->toUser();
-                $data = [
-                    'token_type' => 'bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
-                    'access_token' => $token,
-                    'user' => $authenticatedUser
-                ];
-                DB::commit();
-                return $this->successResponse($data, "OTP verified successfully. Verification completed.");
-            } else {
-                DB::rollBack();
-                return $this->errorResponse("Some error occurred. Please resend OTP.");
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse("Error: " . $e->getMessage());
-        }
+        return $this->userInterface->verifyRegistrationOTP($request);
     }
 
     /**
@@ -383,35 +316,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors()->first());
         }
-
-        DB::beginTransaction();
-        try {
-            $user = User::where(["mobile_no" => $request->mobile])->first();
-            $email_otp = generateOTP();
-            $mobile_otp = generateOTP();
-            $expiresAt = now()->addMinutes(5);
-            $verificationCode = VerificationCodes::updateOrCreate(["user_id" => $user->uuid], [
-                "mobile_otp" => $mobile_otp,
-                "email_otp" => $email_otp,
-                "expire_at" => $expiresAt
-            ]);
-
-            event(new RegistrationOTPSendEvent($user));
-
-            $data = [
-                "mobile_otp" => $verificationCode->mobile_otp,
-                "email_otp" => $verificationCode->email_otp,
-                "expire_at" => $expiresAt->format('d M Y h:i:s A'),
-            ];
-            $emailMask = Str::mask($user->email, '*', 2, 5);
-            $mobileMask = Str::mask($user->mobile_no, '*', 2, 5);
-            $message = "We have sent OTP your registered mobile number({$mobileMask}) & email({$emailMask}). OTPs expire within 5 min.";
-            DB::commit();
-            return $this->successResponse($data, $message);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->userInterface->resendRegistrationOTP($request);
     }
 
     /**
@@ -500,34 +405,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-        DB::beginTransaction();
-        try {
-            $user = User::where(["mobile_no" => $request->mobile])->first();
-            $email_otp = generateOTP();
-            $mobile_otp = generateOTP();
-            $expiresAt = now()->addMinutes(5);
-            $verificationCode = VerificationCodes::updateOrCreate(["user_id" => $user->uuid], [
-                "mobile_otp" => $mobile_otp,
-                "email_otp" => $email_otp,
-                "expire_at" => $expiresAt
-            ]);
-
-            event(new RegistrationOTPSendEvent($user));
-
-            $data = [
-                "mobile_otp" => $verificationCode->mobile_otp,
-                "email_otp" => $verificationCode->email_otp,
-                "expire_at" => $expiresAt->format('d M Y h:i:s A'),
-            ];
-            $emailMask = Str::mask($user->email, '*', 2, 5);
-            $mobileMask = Str::mask($user->mobile_no, '*', 2, 5);
-            $message = "We have sent OTP your registered mobile number({$mobileMask}) & email({$emailMask}). OTPs expire within 5 min.";
-            DB::commit();
-            return $this->successResponse($data, $message);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->userInterface->forgotPassword($request);
     }
 
     /**
@@ -610,43 +488,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors()->first());
         }
-
-        DB::beginTransaction();
-
-        try {
-            $user = User::where('mobile_no', $request->mobile)->first();
-            $verificationCode = VerificationCodes::where('user_id', $user->uuid)->first();
-
-            if ($verificationCode) {
-                if (now()->greaterThan($verificationCode->expire_at)) {
-                    return $this->errorResponse("OTP expired. Please resend OTP.");
-                }
-                if ($request->mobile_otp !== $verificationCode->mobile_otp) {
-                    return $this->errorResponse("Mobile OTP invalid. Please resend OTP.");
-                }
-                if ($request->email_otp !== $verificationCode->email_otp) {
-                    return $this->errorResponse("Email OTP invalid. Please resend OTP.");
-                }
-
-                $temp_token = mt_rand(1111, 9999) . Hash::make($user->email);
-                $user->update([
-                    'temp_token' => $temp_token,
-                ]);
-                $verificationCode->delete();
-
-                $data = [
-                    "temp_token" => $temp_token,
-                ];
-                DB::commit();
-                return $this->successResponse($data, "OTP verified successfully.");
-            } else {
-                DB::rollBack();
-                return $this->errorResponse("Some error occurred. Please resend OTP.");
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse("Error: " . $e->getMessage());
-        }
+        return $this->userInterface->verifyforgotPasswordOtp($request);
     }
 
     /**
@@ -729,28 +571,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors()->first());
         }
-
-        DB::beginTransaction();
-
-        try {
-            $user = User::where('temp_token', $request->temp_token)->first();
-
-            if ($user) {
-
-                $user->update([
-                    "password" => Hash::make($request->password),
-                    "temp_token" => null,
-                ]);
-                DB::commit();
-                return $this->successResponse([], "Your password successfully changed. Please login using new password.");
-            } else {
-                DB::rollBack();
-                return $this->errorResponse("Some error occurred.");
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse("Error: " . $e->getMessage());
-        }
+        return $this->userInterface->updatePassword($request);
     }
 
     /**
@@ -826,33 +647,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-        DB::beginTransaction();
-        try {
-            $user = User::where(["mobile_no" => $request->mobile])->first();
-            if ($user->email_verified_at == null || $user->mobile_verified_at == null) {
-                return $this->errorResponse("Please verify your mobile number and email address.");
-            }
-            $mobile_otp = generateOTP();
-            $expiresAt = now()->addMinutes(5);
-            $verificationCode = VerificationCodes::updateOrCreate(["user_id" => $user->uuid], [
-                "mobile_otp" => $mobile_otp,
-                "expire_at" => $expiresAt
-            ]);
-
-            // event(new RegistrationOTPSendEvent($user));
-
-            $data = [
-                "mobile_otp" => $verificationCode->mobile_otp,
-                "expire_at" => $expiresAt->format('d M Y h:i:s A'),
-            ];
-            $mobileMask = Str::mask($user->mobile_no, '*', 2, 5);
-            $message = "We have sent OTP your registered mobile number({$mobileMask}). OTPs expire within 5 min.";
-            DB::commit();
-            return $this->successResponse($data, $message);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->userInterface->loginOTPSend($request);
     }
 
     /**
@@ -971,41 +766,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-        DB::beginTransaction();
-
-        try {
-            $user = User::where('mobile_no', $request->mobile)->first();
-            $verificationCode = VerificationCodes::where('user_id', $user->uuid)->first();
-
-            if ($verificationCode) {
-                if (now()->greaterThan($verificationCode->expire_at)) {
-                    return $this->errorResponse("OTP expired. Please resend OTP.");
-                }
-                if ($request->mobile_otp !== $verificationCode->mobile_otp) {
-                    return $this->errorResponse("Mobile OTP invalid. Please resend OTP.");
-                }
-
-                $verificationCode->delete();
-
-                // Generate JWT token for the user
-                $token = JWTAuth::fromUser($user);
-                $authenticatedUser = JWTAuth::setToken($token)->toUser();
-                $data = [
-                    'token_type' => 'bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
-                    'access_token' => $token,
-                    'user' => $authenticatedUser
-                ];
-                DB::commit();
-                return $this->successResponse($data, "OTP verified successfully. Verification completed.");
-            } else {
-                DB::rollBack();
-                return $this->errorResponse("Some error occurred. Please resend OTP.");
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse("Error: " . $e->getMessage());
-        }
+        return $this->userInterface->verifyLoginOTP($request);
     }
 
 
@@ -1123,33 +884,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-        try {
-            $credentials = $request->only(["email", "password"]);
-            if (Auth::attempt($credentials)) {
-                $user = Auth::user();
-
-                if ($user->email_verified_at == null || $user->mobile_verified_at == null) {
-                    Auth::logout();
-                    return $this->errorResponse("Please verify your mobile number and email address.");
-                }
-                // Generate JWT token for the user
-                $token = JWTAuth::fromUser($user);
-                $authenticatedUser = JWTAuth::setToken($token)->toUser();
-                // $this->authenticatedUser($request, $user);
-                $data = [
-                    'token_type' => 'bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
-                    'access_token' => $token,
-                    'user' => $authenticatedUser
-                ];
-
-                return $this->successResponse($data, "User Logged-in successfully.");
-            } else {
-                return $this->errorResponse("Please check your password.");
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse("Error: " . $e->getMessage());
-        }
+        return $this->userInterface->loginUsingEmail($request);
     }
 
     /**
@@ -1186,19 +921,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        try {
-            $token = JWTAuth::getToken();
-
-            if (!$token) {
-                return $this->errorResponse('Token not provided', 400);
-            }
-
-            JWTAuth::invalidate($token);
-
-            return $this->successResponse(['message' => 'Successfully logged out']);
-        } catch (JWTException $e) {
-            return $this->errorResponse('Failed to logout', 500);
-        }
+       return $this->userInterface->logout();
     }
 
     /**
