@@ -41,12 +41,13 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                 "mobile_otp" => $mobile_otp,
                 "email_otp" => $email_otp,
                 "expire_at" => $expiresAt,
-                "temp_token" => $temp_token
+                "token" => $temp_token
             ]);
 
             event(new RegistrationOTPSendEvent($user));
 
             $data = [
+                "temp_token" => $temp_token,
                 "mobile_otp" => $verificationCode->mobile_otp,
                 "email_otp" => $verificationCode->email_otp,
                 "expire_at" => $expiresAt->format('d M Y h:i:s A'),
