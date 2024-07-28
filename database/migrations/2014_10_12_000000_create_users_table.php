@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->uuid();
             $table->string('name');
-            $table->string('username')->nullable();
             $table->text('profile_image')->nullable();
             $table->string('email', 100)->unique();
             $table->string('mobile_no', 20)->unique();
-            $table->enum('role', ["user", "superadmin"])->default("user")->comment("user, superadmin");
+            $table->enum('role', ["user", "superadmin","store","rider"])->default("user")->comment("user, superadmin, store, rider");
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('mobile_verified_at')->nullable();
             $table->string('temp_token')->nullable();
@@ -26,8 +25,10 @@ return new class extends Migration
             $table->boolean('aadhar_verified')->default(0);
             $table->boolean('pan_verified')->default(0);
             $table->boolean('bank_verified')->default(0);
-            $table->boolean('vpa_verified')->default(0);
-            $table->boolean('kyc_verified')->default(0);
+            $table->boolean('fssai_verified')->default(0)->comment("Only Store");
+            $table->boolean('gst_verified')->default(0)->comment("Only Store");
+            $table->string('facebook_id')->nullable();
+            $table->string('google_id')->nullable();
             $table->string('google2fa_secret')->nullable();
             $table->enum('google2fa_enable', ["yes", "no"])->default("no");
             $table->timestamp('google2fa_enable_at')->nullable()->default(null);

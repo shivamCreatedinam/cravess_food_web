@@ -17,7 +17,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 
-class CommonServiceRepository extends EloquentBaseRepository implements CommonServiceInterface
+class CommonServiceRepository implements CommonServiceInterface
 {
     use ApiResponseTrait;
     use ImageUploadTrait;
