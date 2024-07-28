@@ -22,7 +22,7 @@ Route::post("login", [AuthController::class, "loginPost"])->name("loginPost");
 
 Route::get("header", [HomeController::class, "printHeaders"]);
 
-Route::group(['middleware' => 'auth:web'], function () {
+Route::group(['prefix' => 'admin','middleware' => 'auth:web'], function () {
 
     Route::get('/dashboard', [HomeController::class, "dashboard"])->name("dashboard");
 
