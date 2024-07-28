@@ -27,7 +27,6 @@ class EloquentUserRepository extends EloquentBaseRepository implements UserInter
         try {
             $user = $this->model::create([
                 "name" => $request->name,
-                "username" => Str::slug($request->name, "_"),
                 "email" => $request->email,
                 "mobile_no" => $request->mobile,
                 "role" => "user",
@@ -382,6 +381,6 @@ class EloquentUserRepository extends EloquentBaseRepository implements UserInter
     }
 
     public function sendMobileOTP($request){
-        
+
     }
 }

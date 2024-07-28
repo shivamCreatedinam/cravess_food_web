@@ -16,7 +16,6 @@ class SuperAdminSeeder extends Seeder
     {
         $superAdmin = [
             "name" => "Super Admin",
-            "username" => "superadmin",
             "email" => "superadmin@yopmail.com",
             "mobile_no" => "123456780",
             "role" => "superadmin",

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Super Admin Panel Web Routes
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
@@ -16,12 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::get("/", [AuthController::class, "loginView"])->name("login");
 Route::post("login", [AuthController::class, "loginPost"])->name("loginPost");
 
 Route::get("header", [HomeController::class, "printHeaders"]);
 
-Route::group(['prefix' => 'admin',  'middleware' => 'auth:web'], function () {
+Route::group(['middleware' => 'auth:web'], function () {
 
     Route::get('/dashboard', [HomeController::class, "dashboard"])->name("dashboard");
 
