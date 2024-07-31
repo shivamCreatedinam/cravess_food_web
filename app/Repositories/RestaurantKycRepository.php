@@ -81,14 +81,16 @@ class RestaurantKycRepository implements RestaurantKycInterface
 
             $path = "gst_image/" . $user->uuid;
             if ($request->hasFile("gst_cert_image")) {
-                if (!is_null($getGSTData->gst_image)) {
+                if ($getGSTData && !is_null($getGSTData->gst_image)) {
                     $this->deleteImage($getGSTData->gst_image);
                 }
                 $gst_image = $this->uploadImage($request->file('gst_cert_image'), $path);
             }
-            $getGSTData->updateOrCreate(
+            StoreVerification::updateOrCreate(
                 [
                     'user_id' => $user->uuid,
+                ],
+                [
                     "gst_image" => $gst_image,
                     "gst_no" => strtolower($request->gst_number),
                     "gst_verification" => "pending"
@@ -107,14 +109,16 @@ class RestaurantKycRepository implements RestaurantKycInterface
             $getFssaiData = StoreVerification::where("user_id", $user->uuid)->first();
             $path = "fssai_image/" . $user->uuid;
             if ($request->hasFile("fssai_image")) {
-                if (!is_null($getFssaiData->fssai_image)) {
+                if ($getFssaiData && !is_null($getFssaiData->fssai_image)) {
                     $this->deleteImage($getFssaiData->fssai_image);
                 }
                 $fssai_image = $this->uploadImage($request->file('fssai_image'), $path);
             }
-            $getFssaiData->updateOrCreate(
+            StoreVerification::updateOrCreate(
                 [
                     'user_id' => $user->uuid,
+                ],
+                [
                     "fssai_image" => $fssai_image,
                     "fssai_verification" => "pending"
                 ]

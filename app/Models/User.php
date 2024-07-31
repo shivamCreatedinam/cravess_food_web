@@ -98,4 +98,20 @@ class User extends Authenticatable implements JWTSubject
 
         return null;
     }
+
+    public function restoDetails()
+    {
+        return $this->hasOne(StoreDetails::class, 'user_id');
+    }
+
+    public function restoMedia()
+    {
+        return $this->hasOne(StoreMedia::class, 'user_id');
+    }
+
+    public function restoVerifications()
+    {
+        return $this->hasOne(StoreVerification::class, 'user_id');
+    }
+
 }

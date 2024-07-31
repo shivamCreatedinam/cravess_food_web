@@ -32,6 +32,7 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                 "mobile_no" => $request->mobile,
                 "role" => "store",
                 "password" => Hash::make($request->password),
+                'resto_rider_status' => 'pending'
             ]);
             $email_otp = generateOTP();
             $mobile_otp = generateOTP();
@@ -167,10 +168,22 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                     Auth::logout();
                     return $this->errorResponse("You are not be authorized in this portal.");
                 }
+
                 if ($user->email_verified_at == null || $user->mobile_verified_at == null) {
                     Auth::logout();
                     return $this->errorResponse("Please verify your mobile number and email address.");
                 }
+
+                if ($user->user_status != 'active') {
+                    Auth::logout();
+                    return $this->errorResponse("Your account is not active. Please contact administrator.");
+                }
+
+                // if ($user->resto_rider_status == 'pending') {
+                //     Auth::logout();
+                //     return $this->errorResponse("Your request is pending. Please wait for approval.");
+                // }
+
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();

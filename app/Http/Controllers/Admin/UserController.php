@@ -153,7 +153,18 @@ class UserController extends Controller
                     $user->update([
                         "google2fa_enable" => $user->google2fa_enable == "yes" ? "no" : "yes"
                     ]);
-                } else {
+                }
+                elseif ($status_type == "gst_verify") {
+                    $user->update([
+                        "gst_verified" => $user->gst_verified == 1 ? 0 : 1
+                    ]);
+                }
+                elseif ($status_type == "fssai_verify") {
+                    $user->update([
+                        "fssai_verified" => $user->fssai_verified == 1 ? 0 : 1
+                    ]);
+                }
+                else {
                     return $this->errorResponse("Invalid Request.");
                 }
                 return $this->successResponse([], "User Status Successfully Changed.");

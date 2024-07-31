@@ -20,6 +20,8 @@ return new class extends Migration
             $table->text("store_serving")->nullable()->comment("Store Serving Dishes type id in json format");
             $table->string("store_mobile_no", 15)->nullable();
             $table->string("store_phone_no", 15)->nullable();
+            $table->string("store_email", 100)->nullable();
+            $table->string("website", 100)->nullable();
             $table->string("store_address")->nullable();
             $table->string("store_city", 50)->nullable();
             $table->string("store_state", 50)->nullable();

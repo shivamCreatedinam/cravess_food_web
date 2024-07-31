@@ -33,6 +33,8 @@ return new class extends Migration
             $table->enum('google2fa_enable', ["yes", "no"])->default("no");
             $table->timestamp('google2fa_enable_at')->nullable()->default(null);
             $table->enum('user_status',["active","block","ban"])->nullable()->default('active');
+            $table->enum('resto_rider_status',["pending","approved","cancelled"])->nullable();
+            $table->text('resto_rider_reason')->nullable()->comment("Cancellation Reason");
 
             $table->rememberToken();
             $table->timestamps();
