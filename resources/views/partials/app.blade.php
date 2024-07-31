@@ -2,12 +2,15 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- <meta http-equiv="X-UA-Compatible" content="IE=edge" /> --}}
     <title>Cravess - @yield('title')</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
     <link rel="icon" href="{{ asset('public/assets/img/kaiadmin/favicon1.png') }}" type="image/x-icon" />
-    <meta name="csrf_token" content="{{ csrf_token() }}" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap5-toggle@5.1.1/css/bootstrap5-toggle.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" />
+
 
     <!-- Fonts and icons -->
     <script src="{{ asset('public/assets/js/plugin/webfont/webfont.min.js') }}"></script>
@@ -38,6 +41,8 @@
 
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="{{ asset('public/assets/css/demo.css') }}" />
+    <link rel="stylesheet" href="{{ asset('public/assets/css/toast.min.css') }}">
+
     @stack('style')
 </head>
 
@@ -98,7 +103,20 @@
     <script src="{{ asset('public/assets/js/setting-demo.js') }}"></script>
     <script src="{{ asset('public/assets/js/demo.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap5-toggle@5.1.1/js/bootstrap5-toggle.jquery.min.js"></script>
+    <script src="{{ asset('public/assets/js/plugin/toast/toast.min.js') }}"></script>
 
+    <script>
+        function toast(text, icon = 'success', hideDuration = 5000) {
+            $.toast({
+                text: text,
+                position: 'top-right',
+                icon: icon,
+                showHideTransition: 'slide',
+                hideAfter: hideDuration,
+                stack: false
+            })
+        }
+    </script>
     <script>
         $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
             type: "line",

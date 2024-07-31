@@ -6,7 +6,7 @@
             <a href="{{ route('dashboard') }}" class="logo">
                 {{-- <img src="{{ asset('public/assets/img/kaiadmin/logo_light.svg') }}" alt="navbar brand" class="navbar-brand"
                     height="20" /> --}}
-                    <h3 class="text-warning font-bold text-center"><strong>Cravess Food</strong></h3>
+                <h3 class="text-warning font-bold text-center"><strong>Cravess Food</strong></h3>
             </a>
             <div class="nav-toggle">
                 <button class="btn btn-toggle toggle-sidebar">
@@ -41,6 +41,34 @@
                 </li>
 
                 <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#restaurant">
+                        <i class="fas fa-utensils"></i>
+                        <p>Restaurants</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="restaurant">
+                        <ul class="nav nav-collapse">
+                            <li>
+                                <a href="#">
+                                    <span class="sub-item">Add New Restaurant</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('resto_pending_list') }}">
+                                    <span class="sub-item">Pending for Approval</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('resto_list') }}">
+                                    <span class="sub-item">Restaurants List</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#users">
                         <i class="fas fa-users"></i>
                         <p>Users</p>
@@ -49,7 +77,7 @@
                     <div class="collapse" id="users">
                         <ul class="nav nav-collapse">
                             <li>
-                                <a href="{{ route('admin_user_list')}}">
+                                <a href="{{ route('admin_user_list') }}">
                                     <span class="sub-item">User List</span>
                                 </a>
                             </li>

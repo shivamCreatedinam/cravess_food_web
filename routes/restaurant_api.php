@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Restaurant\AuthController;
+use App\Http\Controllers\Restaurant\HomeController;
 use App\Http\Controllers\Restaurant\KycController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,5 +27,7 @@ Route::group(['middleware' => ['jwt']], function () {
     Route::post('aadhar-pan-card-update',[KycController::class,"aadharPanCardUpdate"]);
     Route::post('gst-update',[KycController::class,"gstUpdate"]);
     Route::post('fssai-details-update',[KycController::class,"fssaiDetailsUpdate"]);
+    Route::post('resto-details-update',[HomeController::class,"restoDetailsUpdate"]);
+    Route::post('resto-images-upload',[HomeController::class,"restoImagesUpdate"]);
     Route::post('logout', [AuthController::class, "logout"]);
 });

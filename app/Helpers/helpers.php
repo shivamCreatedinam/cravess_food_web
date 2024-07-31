@@ -25,3 +25,29 @@ if (!function_exists('getNameLetters')) {
         return str_replace(' ', '', $initials);
     }
 }
+
+if (!function_exists("generateRestaurantId")) {
+    function generateRestaurantId($storeName, $storeMobileNo)
+    {
+        // Prefix
+        $prefix = 'RESTO';
+
+        // Combine store name and mobile number
+        $combined = $storeName . $storeMobileNo;
+
+        // Generate a hash of the combined string
+        $hash = strtoupper(substr(md5($combined), 0, 10));
+
+        // Generate the unique ID
+        $uniqueId = $prefix . $hash;
+
+        // Ensure the ID is 15 characters long
+        if (strlen($uniqueId) < 15) {
+            $uniqueId = str_pad($uniqueId, 15, '0');
+        } elseif (strlen($uniqueId) > 15) {
+            $uniqueId = substr($uniqueId, 0, 15);
+        }
+
+        return $uniqueId;
+    }
+}
