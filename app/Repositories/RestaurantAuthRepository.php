@@ -89,6 +89,7 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();
+                $authenticatedUser->load(['restoDetails', 'restoMedia','restoVerifications']);
                 $data = [
                     'token_type' => 'bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60,
@@ -187,6 +188,7 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();
+                $authenticatedUser->load(['restoDetails', 'restoMedia','restoVerifications']);
                 // $this->authenticatedUser($request, $user);
                 $data = [
                     'token_type' => 'bearer',

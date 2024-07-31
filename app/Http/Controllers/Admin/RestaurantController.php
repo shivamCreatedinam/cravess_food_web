@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\StoreVerification;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
 
 class RestaurantController extends Controller
 {
+    use ApiResponseTrait;
     public function __construct()
     {
     }
@@ -165,6 +167,7 @@ class RestaurantController extends Controller
                 ]);
             }
         } catch (Exception $e) {
+            return errorResponse($e->getMessage());
         }
     }
 }
