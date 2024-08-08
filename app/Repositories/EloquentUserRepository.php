@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Events\RegistrationOTPSendEvent;
 use App\Interfaces\UserInterface;
+use App\Models\UserProfile;
 use App\Models\VerificationCodes;
 use App\Traits\ApiResponseTrait;
 use App\Traits\ImageUploadTrait;
@@ -84,6 +85,7 @@ class EloquentUserRepository extends EloquentBaseRepository implements UserInter
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();
+                $authenticatedUser->load(['userProfile']);
                 $data = [
                     'token_type' => 'bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60,
@@ -318,6 +320,7 @@ class EloquentUserRepository extends EloquentBaseRepository implements UserInter
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();
+                $authenticatedUser->load(['userProfile']);
                 // $this->authenticatedUser($request, $user);
                 $data = [
                     'token_type' => 'bearer',
@@ -374,13 +377,37 @@ class EloquentUserRepository extends EloquentBaseRepository implements UserInter
                 "name" => $name,
                 "profile_image" => $profile_image
             ]);
+
+            $cover_photo = null;
+            $path = "cover_image/" . $user->uuid;
+            if ($request->hasFile("cover_photo")) {
+                if (!is_null($user->cover_photo)) {
+                    $this->deleteImage($user->cover_photo);
+                }
+                $cover_photo = $this->uploadImage($request->file('cover_photo'), $path);
+            }
+
+            $getProfile = UserProfile::where("user_id", $user->uuid)->first();
+            $old_cover_image = !is_null($getProfile) && !is_null($getProfile->cover_photo) ? $getProfile->cover_photo : null;
+
+            UserProfile::updateOrCreate([
+                "user_id" => $user->uuid
+            ], [
+                "cover_photo" => !is_null($cover_photo) ? $cover_photo : $old_cover_image,
+                "date_of_birth" => $request->date_of_birth,
+                "anniversary_date" => $request->anniversary_date,
+                "alternative_mobile" => $request->alternative_mobile,
+                "gender" => $request->gender,
+                "food_preference" => $request->food_preference,
+            ]);
+
             return $this->successResponse([], "User Profile successfully update.");
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
 
-    public function sendMobileOTP($request){
-
+    public function sendMobileOTP($request)
+    {
     }
 }

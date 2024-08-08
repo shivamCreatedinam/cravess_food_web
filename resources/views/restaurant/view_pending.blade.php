@@ -251,6 +251,30 @@
             </div>
         </div>
     </div>
+
+    {{-- Model Box --}}
+    <div class="modal fade" id="cancellationModal" tabindex="-1" aria-labelledby="cancellationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancellationModalLabel">New message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="javascript:void(0)" id="cancellation_reason_model">
+                        <div class="mb-3">
+                            <label for="reason" class="col-form-label">Cancellation Reason:</label>
+                            <textarea class="form-control" id="reason"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('script')
     <script>
@@ -259,6 +283,15 @@
                 if (confirm("Are you sure process this action.")) {
                     let approveBtn = $(this)
                     approveRequest(approveBtn)
+                } else {
+                    toast("Cancelled request.", 'error')
+                }
+            })
+
+            $(".statusRejectBtn").on("click",function(){
+                if (confirm("Are you sure reject this action.")) {
+                    let rejectBtn = $(this)
+                    // approveRequest(approveBtn)
                 } else {
                     toast("Cancelled request.", 'error')
                 }
