@@ -211,8 +211,8 @@ class UserController extends Controller
      * @OA\Post(
      *     path="/update-profile",
      *     tags={"User Profile"},
-     *     summary="Update User Profile name & profile image",
-     *     description="Update the authenticated user's profile information.",
+     *     summary="Update User Profile",
+     *     description="Update the authenticated user's profile information, including name, profile image, cover photo, date of birth, anniversary date, alternative mobile, gender, and food preference.",
      *     security={{"Bearer":{}}},
      *     @OA\RequestBody(
      *         required=false,
@@ -220,7 +220,13 @@ class UserController extends Controller
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
      *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="profile_image", type="string", format="binary")
+     *                 @OA\Property(property="profile_image", type="string", format="binary"),
+     *                 @OA\Property(property="cover_photo", type="string", format="binary"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *                 @OA\Property(property="anniversary_date", type="string", format="date", example="2015-06-15"),
+     *                 @OA\Property(property="alternative_mobile", type="string", example="1234567890"),
+     *                 @OA\Property(property="gender", type="string", enum={"male", "female", "other"}, example="male"),
+     *                 @OA\Property(property="food_preference", type="string", enum={"veg", "non_veg", "both"}, example="veg")
      *             )
      *         )
      *     ),
@@ -238,11 +244,19 @@ class UserController extends Controller
      *     )
      * )
      */
+
     public function updateProfile(Request $request)
     {
         $validator = Validator::make($request->all(), [
             "name" => 'string',
-            "profile_image" => "file|mimes:png,jpg,jpeg|max:2048"
+            "profile_image" => "file|mimes:png,jpg,jpeg|max:2048",
+            "cover_photo" => "file|mimes:png,jpg,jpeg|max:2048",
+            "date_of_birth" => "nullable",
+            "anniversary_date" => "nullable",
+            "alternative_mobile" => "nullable",
+            "gender" => "nullable|in:male,female,other",
+            "food_preference" => "nullable|in:veg,non_veg,both",
+
         ]);
 
         if ($validator->fails()) {
@@ -429,7 +443,7 @@ class UserController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-       return $this->commonServiceInterface->verifyNewMailOTP($request);
+        return $this->commonServiceInterface->verifyNewMailOTP($request);
     }
 
     /**
@@ -495,7 +509,7 @@ class UserController extends Controller
             return $this->validationErrorResponse($validator->errors()->first());
         }
 
-       return $this->commonServiceInterface->verifyMobileOTPAndSendNewMobileOTP($request);
+        return $this->commonServiceInterface->verifyMobileOTPAndSendNewMobileOTP($request);
     }
 
 

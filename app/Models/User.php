@@ -114,4 +114,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(StoreVerification::class, 'user_id');
     }
 
+    public function userProfile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id');
+    }
+
 }
