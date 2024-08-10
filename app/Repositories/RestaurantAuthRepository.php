@@ -89,7 +89,7 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();
-                $authenticatedUser->load(['restoDetails', 'restoMedia','restoVerifications']);
+                $authenticatedUser->load(['restoDetails', 'restoMedia', 'restoVerifications']);
                 $data = [
                     'token_type' => 'bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60,
@@ -188,7 +188,7 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
                 // Generate JWT token for the user
                 $token = JWTAuth::fromUser($user);
                 $authenticatedUser = JWTAuth::setToken($token)->toUser();
-                $authenticatedUser->load(['restoDetails', 'restoMedia','restoVerifications']);
+                $authenticatedUser->load(['restoDetails', 'restoMedia', 'restoVerifications']);
                 // $this->authenticatedUser($request, $user);
                 $data = [
                     'token_type' => 'bearer',
@@ -220,6 +220,24 @@ class RestaurantAuthRepository implements RestaurantAuthInterface
             return $this->successResponse(['message' => 'Successfully logged out']);
         } catch (JWTException $e) {
             return $this->errorResponse('Failed to logout', 500);
+        }
+    }
+
+    public function checkRestaurantAccount($request)
+    {
+        try {
+            $user = User::where(['email' => $request->email, 'role' => 'store'])->first();
+            if ($user) {
+                $data = [
+                    "redirect_url" => config('constant.restaurant_portal_url') . "?email=" . $user->email
+                ];
+            } else {
+                return $this->errorResponse($request->email . " - This email not found.");
+            }
+
+            return $this->successResponse($data, "Restaurant Successfully Fetched.");
+        } catch (Exception $e) {
+            return $this->errorResponse('Failed :' . $e->getMessage());
         }
     }
 }

@@ -22,6 +22,7 @@ Route::post("register", [AuthController::class, "register"]);
 Route::post("verify-registration-otp", [AuthController::class, "verifyRegistrationOTP"]);
 Route::post("resend-registration-otp", [AuthController::class, "resendRegistrationOTP"]);
 Route::post("login", [AuthController::class, "login"]);
+Route::post("check-restaurant-account", [AuthController::class, "checkRestaurantAccount"]);
 
 Route::group(['middleware' => ['jwt']], function () {
     Route::post('aadhar-pan-card-update',[KycController::class,"aadharPanCardUpdate"]);
