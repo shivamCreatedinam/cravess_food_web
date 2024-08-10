@@ -6,15 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\RestaurantAuthInterface;
 use App\Rules\EmailOrMobile;
 use App\Traits\ApiResponseTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     use ApiResponseTrait;
-    public function __construct(private RestaurantAuthInterface $restaurantAuthInterface)
-    {
-    }
+    public function __construct(private RestaurantAuthInterface $restaurantAuthInterface) {}
 
 
     /**
@@ -200,7 +199,7 @@ class AuthController extends Controller
         return $this->restaurantAuthInterface->verifyRegistrationOTP($request);
     }
 
-       /**
+    /**
      * @OA\Post(
      *     path="/store/resend-registration-otp",
      *     summary="Resend Registration OTP",
@@ -327,13 +326,57 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "email"=>"required|exists:users,email",
-            "password"=>"required"
+            "email" => "required|exists:users,email",
+            "password" => "required"
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors()->first());
         }
         return $this->restaurantAuthInterface->loginUsingEmail($request);
+    }
+
+
+    /**
+     * @OA\Post(
+     *     path="/store/check-restaurant-account",
+     *     tags={"Restaurant - Check restaurant account"},
+     *     summary="Check Restaurant Account",
+     *     description="Check Restaurant Account If exist or not exist",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="string",
+     *                     description="Email address of the Restaurant",
+     *                     example="john.doe@example.com"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation"
+     *     )
+     * )
+     */
+    public function checkRestaurantAccount(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            "email" => "required|exists:users,email",
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors()->first());
+        }
+        return $this->restaurantAuthInterface->checkRestaurantAccount($request);
     }
 }
