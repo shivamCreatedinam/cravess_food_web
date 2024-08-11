@@ -47,6 +47,9 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post("verify-new-mobile-otp-and-update-mobile",[UserController::class,"verifyNewMobileOTP"]);
 
 
+        // Update FCM Token API
+        Route::post('update-fcm-token',[UserController::class,"updateFCMToken"]);
+
         Route::post('logout', [AuthController::class, "logout"]);
     });
 

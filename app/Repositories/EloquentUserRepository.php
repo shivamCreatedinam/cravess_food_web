@@ -407,7 +407,18 @@ class EloquentUserRepository extends EloquentBaseRepository implements UserInter
         }
     }
 
-    public function sendMobileOTP($request)
+    public function updateFCMToken($request)
     {
+        try {
+            $user = Auth::user();
+
+            $user->update([
+                "fcm_token" => $request->fcm_token,
+            ]);
+
+            return $this->successResponse([], "User FCM token successfully update.");
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
     }
 }

@@ -24,9 +24,7 @@ class UserController extends Controller
     use ApiResponseTrait;
     use ImageUploadTrait;
 
-    public function __construct(private UserInterface $userInterface, private CommonServiceInterface $commonServiceInterface)
-    {
-    }
+    public function __construct(private UserInterface $userInterface, private CommonServiceInterface $commonServiceInterface) {}
 
     /**
      * @OA\Post(
@@ -565,5 +563,52 @@ class UserController extends Controller
         }
 
         return $this->commonServiceInterface->verifyNewMailOTP($request);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/update-fcm-token",
+     *     tags={"Update Device Token(FCM Token)"},
+     *     summary="Update fcm token for push notification.",
+     *     security={{"Bearer":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 required={"fcm_token"},
+     *                 @OA\Property(property="fcm_token", type="string", example="abc123token")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Done"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *     )
+     * )
+     */
+    public function updateFCMToken(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "fcm_token" => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors()->first());
+        }
+
+        return $this->userInterface->updateFCMToken($request);
     }
 }
