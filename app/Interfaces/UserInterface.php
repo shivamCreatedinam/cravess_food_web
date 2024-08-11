@@ -17,4 +17,5 @@ interface UserInterface extends BaseInterface
 
     // UserController
     public function updateProfile($request);
+    public function updateFCMToken($request);
 }
