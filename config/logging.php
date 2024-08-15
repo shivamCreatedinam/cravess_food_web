@@ -135,6 +135,13 @@ return [
             'days' => 14,
             'replace_placeholders' => true,
         ],
+        'fcm_notify' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/fcm_notify.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];

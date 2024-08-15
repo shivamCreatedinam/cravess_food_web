@@ -86,6 +86,31 @@
                     </div>
                 </li>
 
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#categories">
+                        <i class="fas fa-utensils"></i>
+                        <p>Product Categories</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="categories">
+                        <ul class="nav nav-collapse">
+
+                            <li>
+                                <a href="{{ route('category_list') }}">
+                                    <span class="sub-item">Category List</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{route('subcategory_list')}}">
+                                    <span class="sub-item">Sub Category List</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
                 {{-- <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#submenu">
                         <i class="fas fa-bars"></i>
