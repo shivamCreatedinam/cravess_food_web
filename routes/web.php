@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductSubCategoryController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +46,24 @@ Route::group(['prefix' => 'admin','middleware' => 'auth:web'], function () {
         Route::post('/user-update', [UserController::class, "userUpdate"])->name("admin_user_update");
         Route::post('/user-status-update', [UserController::class, "userStatusUpdate"])->name("admin_user_status_update");
         Route::post('/resto-approve', [RestaurantController::class, "restoApprove"])->name("resto_approve");
+    });
+
+    Route::group(['prefix' => 'category'], function () {
+        Route::get('/add', [ProductCategoryController::class, "addForm"])->name("category_add");
+        Route::post('/add-post', [ProductCategoryController::class, "categoryStore"])->name("category_store");
+        Route::get('/list', [ProductCategoryController::class, "index"])->name("category_list");
+        Route::get('/edit/{category_id}', [ProductCategoryController::class, "EditPage"])->name("cat_edit_form");
+        Route::post('/update', [ProductCategoryController::class, "Update"])->name("cat_update");
+        Route::get('/delete/{category_id}', [ProductCategoryController::class, "delete"])->name("cat_delete");
+    });
+
+    Route::group(['prefix' => 'sub-category'], function () {
+        Route::get('/add', [ProductSubCategoryController::class, "addForm"])->name("subcategory_add");
+        Route::post('/add-post', [ProductSubCategoryController::class, "categoryStore"])->name("subcategory_store");
+        Route::get('/list', [ProductSubCategoryController::class, "index"])->name("subcategory_list");
+        Route::get('/edit/{sub_cat_id}', [ProductSubCategoryController::class, "EditPage"])->name("subcat_edit_form");
+        Route::post('/update', [ProductSubCategoryController::class, "Update"])->name("subcat_update");
+        Route::get('/delete/{sub_cat_id}', [ProductSubCategoryController::class, "delete"])->name("subcat_delete");
     });
 
     Route::get("logout", [AuthController::class, "logout"])->name("admin_logout");
