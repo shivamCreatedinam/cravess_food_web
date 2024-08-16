@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\FCMServiceInterface;
 use App\Traits\ImageUploadTrait;
 use Illuminate\Http\Request;
 use Exception;
@@ -13,7 +12,6 @@ use App\Models\ProductSubCategory;
 class ProductSubCategoryController extends Controller
 {
     use ImageUploadTrait;
-    public function __construct(private FCMServiceInterface $fCMServiceInterface) {}
 
     public function index(Request $request)
     {
@@ -116,7 +114,6 @@ class ProductSubCategoryController extends Controller
 
     public function EditPage($cat_id)
     {
-        $this->fCMServiceInterface->sendFCMPushNotification(auth()->user(),"Test","Test Body");
         $data['sub_category'] = ProductSubCategory::find($cat_id);
         $data['categories'] = ProductCategory::where("status", 1)->get();
         return view('product_sub_category.edit', $data);
