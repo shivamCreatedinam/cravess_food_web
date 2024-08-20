@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\RestaurantCategoriesController;
 use App\Http\Controllers\Restaurant\AuthController;
 use App\Http\Controllers\Restaurant\HomeController;
 use App\Http\Controllers\Restaurant\KycController;
@@ -32,3 +33,6 @@ Route::group(['middleware' => ['jwt']], function () {
     Route::post('resto-images-upload',[HomeController::class,"restoImagesUpdate"]);
     Route::post('logout', [AuthController::class, "logout"]);
 });
+
+Route::get('get-categories',[RestaurantCategoriesController::class,'getCategories']);
+Route::get('get-subcategory/{cat_id}',[RestaurantCategoriesController::class,'getSubCategories']);
