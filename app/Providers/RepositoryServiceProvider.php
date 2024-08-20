@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Interfaces\CommonServiceInterface;
+use App\Interfaces\ItemCategoriesInterface;
 use App\Interfaces\RestaurantAuthInterface;
 use App\Interfaces\RestaurantCommonInterface;
 use App\Interfaces\RestaurantKycInterface;
@@ -10,6 +11,7 @@ use App\Interfaces\UserInterface;
 use App\Models\User;
 use App\Repositories\CommonServiceRepository;
 use App\Repositories\EloquentUserRepository;
+use App\Repositories\ItemCategoryRepository;
 use App\Repositories\RestaurantAuthRepository;
 use App\Repositories\RestaurantCommonRepository;
 use App\Repositories\RestaurantKycRepository;
@@ -29,6 +31,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(RestaurantAuthInterface::class, RestaurantAuthRepository::class);
         $this->app->singleton(RestaurantKycInterface::class, RestaurantKycRepository::class);
         $this->app->singleton(RestaurantCommonInterface::class, RestaurantCommonRepository::class);
+        $this->app->singleton(ItemCategoriesInterface::class, ItemCategoryRepository::class);
     }
 
     /**
